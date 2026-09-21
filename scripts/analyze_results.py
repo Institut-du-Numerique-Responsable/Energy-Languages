@@ -175,7 +175,7 @@ def write_csv(path, rows):
         path.write_text('')
         return
     with path.open('w', newline='') as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator='\n')
         writer.writeheader()
         for row in rows:
             writer.writerow({key: '|'.join(value) if isinstance(value, list) else value

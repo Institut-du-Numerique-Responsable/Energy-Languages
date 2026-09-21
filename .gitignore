@@ -1,0 +1,36 @@
+# Local assistant state and OS files
+.remember/
+.Codex/
+.codex/
+.agents/
+.DS_Store
+# Dependencies and build output
+node_modules/
+__pycache__/
+*.pyc
+obj/
+bin/
+target/
+*.o
+*.a
+*.so
+*.so.*
+*.dylib
+*.la
+*.mod
+*.class
+*.exe
+*.dll
+*.gcc_run
+*.gpp_run
+RAPL/main
+# Generated benchmark inputs and output
+*-input*.txt
+*.out
+core
+core.*
+# Local secrets
+.env
+.env.*
+*.pem
+*.key

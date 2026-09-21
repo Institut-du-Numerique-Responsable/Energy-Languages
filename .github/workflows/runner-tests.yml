@@ -7,7 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Test runner, orchestration and input generation
+      - name: Test runner, orchestration, input generation and analysis
         run: python3 -m unittest discover -s tests -v
       - name: Build Linux RAPL backend
         run: make -B -C RAPL
+      - name: Verify reproducible numerical report
+        run: |
+          python3 scripts/analyze_results.py
+          git diff --exit-code -- docs/BENCHMARK_RESULTS.md docs/results

@@ -8,6 +8,8 @@ The INR edition addresses the three high-priority runner findings and the orches
 - Target discovery recognizes literal rules in the current standalone Makefiles. It does not resolve includes, variables or generated target names. Rule presence does not validate the command, dependencies or benchmark output.
 - Input generation preserves existing outputs if a generator fails, and replaces each completed file individually. The three replacements are not a single transaction against disk failures or interruption.
 
+The [historical results report](BENCHMARK_RESULTS.md) quantifies data-quality issues and documents the filters used for descriptive comparisons. It does not validate the inherited measurements.
+
 ## Measurement and portability
 
 - RAPL support uses legacy Linux/Intel MSR access and CPU-model checks. Hardware validation is required; native macOS and Apple Silicon are unsupported.

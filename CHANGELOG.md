@@ -1,5 +1,13 @@
 # Changelog
 
+## Historical results documentation — 2026-09-21
+
+- Publish a reproducible descriptive analysis of the inherited CSV files, with source hashes and line references.
+- Separate alternate files and flag invalid readings, very short runs and shifts between contiguous measurement blocks.
+- Add per-benchmark tables, coverage and energy–time figures, derived power and energy–delay metrics, dispersion and within-benchmark Spearman correlations.
+- Document missing experimental metadata and propose controlled cross-analyses without presenting a validated language ranking or invented memory/carbon measurements.
+- Add numerical and parsing regression tests for the analysis script.
+
 ## INR orchestration fixes — 2026-09-21
 
 - Restore the documented root `compile_all.py` as a shared Python 3 runner; migrate the JavaScript, Fortran, FSharp and Java-GraalVM entry points and remove the `lazyme` dependency.

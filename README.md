@@ -18,6 +18,14 @@ This edition adds targeted reliability and safety fixes to the energy measuremen
 
 These changes do **not** establish that any language is more energy efficient. Existing CSV files are inherited results, not measurements produced or revalidated by INR. No new hardware energy measurements accompany this edition.
 
+## Historical benchmark results
+
+Read the [results and cross-analyses](docs/BENCHMARK_RESULTS.md) (French), with [detailed tables for every benchmark](docs/results/TABLES.md), coverage and energy–time charts, and downloadable CSV exports.
+
+The analysis separates alternate files, reports anomalous readings, and documents every filter. It compares energy, duration, derived package power, variability and energy–delay product descriptively. It also proposes controlled follow-up analyses for memory, input size, parallelism and runtime warm-up. These are inherited observations with incomplete experimental metadata, not a new INR ranking of programming languages.
+
+Reproduce the numerical report with `python3 scripts/analyze_results.py`; add `--plots` when Matplotlib is installed to regenerate the figures.
+
 ## Origin and attribution
 
 Upstream project: [greensoftwarelab/Energy-Languages](https://github.com/greensoftwarelab/Energy-Languages).

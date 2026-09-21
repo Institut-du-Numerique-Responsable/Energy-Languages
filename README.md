@@ -6,6 +6,26 @@ This edition adds targeted reliability and safety fixes to the energy measuremen
 
 **En français :** cette version améliorée est maintenue par l'Institut du Numérique Responsable. Elle corrige trois défauts prioritaires du programme de mesure et ajoute des tests. Elle reprend les travaux de Green Software Lab ; elle ne constitue pas une nouvelle validation scientifique du classement des langages.
 
+[**Explore the public website**](https://institut-du-numerique-responsable.github.io/Energy-Languages/) · [Results](https://institut-du-numerique-responsable.github.io/Energy-Languages/resultats.html) · [Methodology](https://institut-du-numerique-responsable.github.io/Energy-Languages/methode.html)
+
+<!-- BEGIN GENERATED FINDINGS -->
+## Key findings from the historical observations
+
+**Read energy together with execution time and power.**
+
+- **Energy and runtime are strongly associated:** within-benchmark Spearman correlations range from 0.938 to 0.996 in the retained exploratory series.
+- **Modest differences in power can accompany large differences in energy:** the n-body example below illustrates the role of duration.
+- **The evidence can be checked:** all 253 series, source lines, quality flags and calculations are published, including series excluded from exploratory comparisons.
+
+| n-body observation | Python / C ratio |
+|---|---:|
+| Median package energy | 157.5× |
+| Median execution time | 133.5× |
+| Median package power | 1.18× |
+
+These ratios describe the inherited sample, **not universal language characteristics**. Hardware and execution metadata are incomplete; correlation does not establish causation. [Read the results, filters and limitations](docs/BENCHMARK_RESULTS.md).
+<!-- END GENERATED FINDINGS -->
+
 ## What INR improved
 
 - Failed benchmark commands now stop the measurement run with a nonzero status; failed samples are not appended to the CSV. Previously completed samples are retained.

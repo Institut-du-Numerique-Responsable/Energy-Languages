@@ -1,0 +1,46 @@
+<section class="hero wrap">
+  <div class="hero-copy">
+    <p class="intro-label">Numérique responsable, données ouvertes</p>
+    <h1>Comprendre l’énergie du code.</h1>
+    <p class="lead">Que révèlent les benchmarks sur la consommation énergétique des langages de programmation ? Explorez les relations entre énergie, temps d’exécution et puissance, à partir de données documentées.</p>
+    <div class="actions"><a class="button" href="resultats.html">Explorer les résultats</a><a class="text-link" href="methode.html">Comprendre la méthode</a></div>
+  </div>
+  <aside class="hero-note" aria-labelledby="hero-note-title">
+    <span class="note-mark" aria-hidden="true">E = P × t</span>
+    <h2 id="hero-note-title">La puissance ne dit pas tout.</h2>
+    <p>Une exécution peut consommer beaucoup d’énergie sans être beaucoup plus puissante : elle peut simplement durer bien plus longtemps.</p>
+    <div class="case-ratios"><div><strong>${duration_ratio}×</strong><span>de durée médiane</span></div><div><strong>${power_ratio}×</strong><span>de puissance médiane</span></div></div>
+    <p class="case-source">Exemple Python/C dans les séries historiques <em>n-body</em> retenues. Rapports descriptifs, pas des propriétés universelles des langages. <a href="resultats.html#n-body">Voir les valeurs</a></p>
+  </aside>
+</section>
+<div class="scope-strip"><div class="wrap"><strong>Des observations, avec leur contexte.</strong><span>Les mesures sont historiques. Les configurations ne sont pas entièrement connues. Cette édition ne publie pas de classement universel.</span></div></div>
+<section class="section wrap" aria-labelledby="conclusions">
+  <div class="section-heading"><p class="intro-label">Ce que les données nous apprennent</p><h2 id="conclusions">Trois enseignements à retenir.</h2></div>
+  <div class="findings">
+    <article><span class="finding-symbol" aria-hidden="true">↗</span><h3>Énergie et durée sont fortement liées.</h3><p>Pour les benchmarks avec plusieurs configurations dans l’échantillon filtré, la corrélation de rang est comprise entre <strong>${rho_min} et ${rho_max}</strong>. Le temps d’exécution est une dimension essentielle de la lecture énergétique.</p><a href="resultats.html#correlations">Examiner les corrélations</a></article>
+    <article><span class="finding-symbol" aria-hidden="true">≈</span><h3>Les watts seuls ne suffisent pas.</h3><p>Dans l’exemple <em>n-body</em>, Python/C représente <strong>${energy_ratio}× l’énergie médiane</strong>, contre ${power_ratio}× la puissance médiane. La durée aide à comprendre cet écart observé.</p><a href="resultats.html#n-body">Lire le cas n-body</a></article>
+    <article><span class="finding-symbol" aria-hidden="true">⌕</span><h3>Une conclusion utile doit être vérifiable.</h3><p>Sources, lignes d’origine, filtres et calculs sont accessibles. Les <strong>${series_count} séries</strong> restent consultables, y compris celles qui sont écartées des croisements exploratoires.</p><a href="methode.html#reproduire">Reproduire l’analyse</a></article>
+  </div>
+  <p class="section-note">Ces associations décrivent l’échantillon. Elles ne séparent pas les effets du langage, de l’algorithme, du compilateur et du matériel.</p>
+</section>
+<section class="plot-section">
+  <div class="wrap">
+    <div class="section-heading"><p class="intro-label">Un résultat, plusieurs dimensions</p><h2>Quand le temps fait monter l’énergie.</h2><p>Chaque point représente une configuration retenue pour <em>n-body</em>. Les quartiles montrent la dispersion des observations. Les lignes obliques matérialisent une puissance constante.</p></div>
+    <figure class="plot"><a href="assets/nbody_energy_time.png"><img src="assets/nbody_energy_time.png" width="1760" height="1120" loading="lazy" alt="Nuage n-body : énergie PKG médiane en joules selon le temps médian en secondes, axes logarithmiques. Les points suivent une forte association positive ; barres des quartiles et lignes de puissance constante à 10, 20 et 40 watts."></a><figcaption>Énergie du package processeur, pas consommation totale à la prise. Conditions expérimentales non vérifiées. <a href="methode.html">Périmètre et filtres</a>.</figcaption></figure>
+  </div>
+</section>
+<section class="section wrap data-section">
+  <div><p class="intro-label">Un corpus accessible</p><h2>Les chiffres se lisent avec leurs sources.</h2><p>${primary_rows} observations dans les fichiers principaux, issues de ${config_count} configurations et ${benchmark_count} benchmarks. Les variantes sont conservées séparément pour éviter de compter plusieurs fois certaines mesures.</p><a class="button secondary" href="resultats.html">Parcourir les tableaux</a></div>
+  <dl class="data-ledger"><div><dt>Observations lisibles, variantes incluses</dt><dd>$raw_rows</dd></div><div><dt>Lignes principales numériquement invalides</dt><dd>$invalid_rows</dd></div><div><dt>Séries écartées des croisements</dt><dd>$excluded_series</dd></div><div><dt>Jeux de données et scripts</dt><dd>Ouverts</dd></div></dl>
+</section>
+<section class="section wrap improvement-section">
+  <div><p class="intro-label">Ce que l’INR apporte</p><h2>Une base plus fiable pour poursuivre le travail.</h2><p>Cette édition améliore l’outil de mesure et rend les résultats hérités plus faciles à examiner. Elle conserve la licence et les crédits du projet original Green Software Lab.</p></div>
+  <ul class="improvements"><li><strong>Les échecs sont visibles.</strong> Une commande échouée n’est plus enregistrée comme une mesure valide.</li><li><strong>Les exécutions sont mieux contrôlées.</strong> Arguments validés, permissions corrigées et orchestrateur commun Python 3.</li><li><strong>Les entrées sont préservées.</strong> Les datasets existants restent intacts si leur génération échoue.</li><li><strong>Les analyses sont reproductibles.</strong> Tests de régression, exports numériques et méthode publiée.</li></ul>
+</section>
+<section class="section wrap faq" aria-labelledby="questions">
+  <h2 id="questions">Les questions qui comptent.</h2>
+  <details><summary>Quel langage de programmation consomme le moins d’énergie ?</summary><p>Ces données ne permettent pas de désigner un gagnant universel. Le résultat dépend de la tâche, de l’implémentation, des entrées, du compilateur et du matériel. Les tableaux présentent des observations historiques par benchmark, avec leurs limites.</p></details>
+  <details><summary>Les résultats sont-ils de nouvelles mesures de l’INR ?</summary><p>Non. L’INR a amélioré les outils et documenté les CSV hérités. Les corrections logicielles ne valident pas rétroactivement les mesures anciennes.</p></details>
+  <details><summary>Peut-on en déduire l’empreinte carbone ou la mémoire utilisée ?</summary><p>Pas directement. L’énergie PKG ne couvre pas toute la machine. DRAM en joules n’est pas un pic mémoire en octets. Une analyse carbone ou mémoire exige des mesures et des informations complémentaires.</p></details>
+  <details><summary>Comment réutiliser le projet ?</summary><p>Consultez le dépôt sous licence MIT, conservez les attributions, puis adaptez et vérifiez les recettes de benchmark sur votre matériel. La méthode explique comment reproduire les analyses sans lancer de benchmark.</p></details>
+</section>

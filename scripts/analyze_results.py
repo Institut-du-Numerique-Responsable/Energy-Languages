@@ -409,6 +409,38 @@ def make_plots(rows, series, output):
     plt.close(fig)
 
 
+def update_readme(root, series, correlation):
+    path = root / 'README.md'
+    if not path.exists():
+        return
+    text = path.read_text()
+    start, end = '<!-- BEGIN GENERATED FINDINGS -->', '<!-- END GENERATED FINDINGS -->'
+    if start not in text or end not in text:
+        return
+    coefficients = [item['spearman_energy_time'] for item in correlation
+                    if item['spearman_energy_time'] is not None]
+    chosen = {item['language']: item for item in series
+              if item['benchmark'] == 'n-body' and item['exploratory_eligible']}
+    if not coefficients or not {'C', 'Python'} <= chosen.keys():
+        raise ValueError('The README example requires eligible C/Python n-body series')
+    c, py = chosen['C'], chosen['Python']
+    findings = ['## Key findings from the historical observations', '',
+                '**Read energy together with execution time and power.**', '',
+                f"- **Energy and runtime are strongly associated:** within-benchmark Spearman correlations range from {min(coefficients):.3f} to {max(coefficients):.3f} in the retained exploratory series.",
+                '- **Modest differences in power can accompany large differences in energy:** the n-body example below illustrates the role of duration.',
+                f"- **The evidence can be checked:** all {len(series)} series, source lines, quality flags and calculations are published, including series excluded from exploratory comparisons.", '',
+                '| n-body observation | Python / C ratio |', '|---|---:|',
+                f"| Median package energy | {py['package_j_median']/c['package_j_median']:.1f}× |",
+                f"| Median execution time | {py['time_s_median']/c['time_s_median']:.1f}× |",
+                f"| Median package power | {py['power_w_median']/c['power_w_median']:.2f}× |", '',
+                'These ratios describe the inherited sample, **not universal language characteristics**. '
+                'Hardware and execution metadata are incomplete; correlation does not establish causation. '
+                '[Read the results, filters and limitations](docs/BENCHMARK_RESULTS.md).']
+    before = text.split(start, 1)[0]
+    after = text.split(end, 1)[1]
+    path.write_text(before + start + '\n' + '\n'.join(findings) + '\n' + end + after)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=Path(__file__).resolve().parents[1])
@@ -439,6 +471,7 @@ def main():
         (output / 'rejected.csv').write_text('source,line,reason\n')
     make_tables(series, output)
     make_report(rows, inventory, rejected, series, correlation, output)
+    update_readme(args.root, series, correlation)
     if args.plots:
         make_plots(rows, series, output)
     print(f'{len(rows)} observations; {len(series)} primary series; outputs: {output}')

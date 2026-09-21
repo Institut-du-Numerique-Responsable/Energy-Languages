@@ -1,5 +1,12 @@
 # Changelog
 
+## Public website — 2026-09-21
+
+- Publish three lightweight French pages presenting findings, searchable historical results and methodology.
+- Highlight energy–time correlations and the scoped n-body comparison in the website and README, generated from the same CSV exports.
+- Add canonical URLs, a sitemap, structured software/dataset metadata and downloadable data, with GitHub Pages deployment after regression checks.
+- Preserve complete HTML tables without JavaScript and document provenance and limitations beside the findings.
+
 ## Historical results documentation — 2026-09-21
 
 - Publish a reproducible descriptive analysis of the inherited CSV files, with source hashes and line references.

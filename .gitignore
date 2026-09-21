@@ -35,3 +35,6 @@ core.*
 .env.*
 *.pem
 *.key
+
+# Static website build output
+_site/

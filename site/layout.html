@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>$title</title>
+  <meta name="description" content="$description">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="theme-color" content="#173d63">
+  <link rel="canonical" href="$canonical">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="Energy Languages — INR">
+  <meta property="og:title" content="$title">
+  <meta property="og:description" content="$description">
+  <meta property="og:url" content="$canonical">
+  <meta property="og:image" content="${base}assets/nbody_energy_time.png">
+  <meta property="og:image:alt" content="Énergie et durée observées pour le benchmark n-body, données historiques exploratoires">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+  <script type="application/ld+json">$schema</script>
+  <script defer src="assets/explorer.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenu">Aller au contenu</a>
+  <header class="site-header wrap">
+    <a class="brand" href="index.html" aria-label="Energy Languages, accueil"><span class="brand-symbol" aria-hidden="true">E<span>/</span>L</span><span>Energy Languages<small>Édition INR</small></span></a>
+    <nav aria-label="Navigation principale">
+      <a href="index.html" $home_current>Le projet</a>
+      <a href="resultats.html" $results_current>Les résultats</a>
+      <a href="methode.html" $method_current>La méthode</a>
+      <a class="repo-link" href="$repo">GitHub <span aria-hidden="true">↗</span></a>
+    </nav>
+  </header>
+  <main id="contenu">$body</main>
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div><strong>Institut du Numérique Responsable</strong><p>Comprendre, mesurer, partager.<br>Projet open source, licence MIT.</p></div>
+      <div><a href="$repo">Code source et contributions</a><a href="methode.html#sources">Origine et auteurs</a><a href="sitemap.xml">Plan du site XML</a><a href="https://institutnr.org">Découvrir l’INR</a></div>
+    </div>
+    <p class="wrap footer-note">Édition documentaire du 21 septembre 2026. Mesures héritées de Green Software Lab ; aucune nouvelle campagne matérielle INR.</p>
+  </footer>
+</body>
+</html>

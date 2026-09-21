@@ -2,7 +2,7 @@
 
 **An improved derivative of [Green Software Lab's Energy-Languages](https://github.com/greensoftwarelab/Energy-Languages), maintained by the Institut du Numérique Responsable (INR).**
 
-This edition adds targeted reliability and safety fixes to the energy measurement runner, regression tests and clearer documentation. The original research and benchmark implementations remain credited to their authors. This is an independent derivative, not an official upstream release.
+This edition adds targeted reliability and safety fixes to the energy measurement runner, a shared Python 3 orchestrator, reliable input generation, regression tests and clearer documentation. The original research and benchmark implementations remain credited to their authors. This is an independent derivative, not an official upstream release.
 
 **En français :** cette version améliorée est maintenue par l'Institut du Numérique Responsable. Elle corrige trois défauts prioritaires du programme de mesure et ajoute des tests. Elle reprend les travaux de Green Software Lab ; elle ne constitue pas une nouvelle validation scientifique du classement des langages.
 
@@ -11,7 +11,9 @@ This edition adds targeted reliability and safety fixes to the energy measuremen
 - Failed benchmark commands now stop the measurement run with a nonzero status; failed samples are not appended to the CSV. Previously completed samples are retained.
 - Command-line arguments and output-file errors are checked. Unbounded argument copies were removed; initialization errors stop execution. A temporary file stages each sample to prevent sensor failures from leaving partial result rows.
 - The RAPL executable is built with permissions `755`, replacing the previous world-writable `777` mode.
-- Automated regression tests exercise the real command runner with simulated hardware readings.
+- A shared Python 3 orchestrator reports failed and missing targets for all five operations. The four legacy entry points delegate to it.
+- Input generation works from any directory, reuses the identical nucleotide dataset and preserves existing inputs when generation fails.
+- Automated regression tests exercise the command runner with simulated hardware readings, orchestration with real Makefiles and input generation with small FASTA datasets.
 - This README, the [changelog](CHANGELOG.md) and [known limitations](docs/KNOWN_LIMITATIONS.md) distinguish completed improvements from remaining work.
 
 These changes do **not** establish that any language is more energy efficient. Existing CSV files are inherited results, not measurements produced or revalidated by INR. No new hardware energy measurements accompany this edition.
@@ -44,7 +46,7 @@ Requires Python 3 and a C compiler (`cc`, or set `CC`):
 python3 -m unittest discover -s tests -v
 ```
 
-These tests validate runner behavior with simulated RAPL functions. They do not validate physical energy readings or all benchmark algorithms.
+These tests validate runner behavior with simulated RAPL functions, orchestration and input generation. They do not validate physical energy readings or all benchmark algorithms. They also require `make` and Bash.
 
 ## Measure energy on supported hardware
 
@@ -64,19 +66,47 @@ The command is interpreted by a shell, allowing the existing input-redirection r
 
 Ten successful repetitions append ten rows to `../Language.csv`. The inherited row format mixes a semicolon after the benchmark name with commas between energy fields; time is in milliseconds. It is not a uniform delimiter-separated table. Errors stop the run; already completed rows remain.
 
-## Input datasets and legacy build recipes
+## Run or inspect benchmark targets
 
-The documented root `compile_all.py` is absent from the imported snapshot. Language-specific copies and Makefiles remain available but are not uniformly functional.
-
-For a fresh checkout, `gen-input.sh` references a generated `.py` file that does not yet exist. To generate the datasets explicitly with Python 3 from the root:
+The root orchestrator requires Python 3 and `make`. It scans the current directory recursively; use `--root` to select a language or benchmark:
 
 ```sh
-python3 Python/fasta/fasta.python3-3.python3 25000000 > knucleotide-input25000000.txt
-cp knucleotide-input25000000.txt revcomp-input25000000.txt
-python3 Python/fasta/fasta.python3-3.python3 5000000 > regexredux-input5000000.txt
+# Check target availability only; no benchmark command is executed.
+python3 compile_all.py measure --check
+python3 compile_all.py compile --root C --check
+
+# Execute a target after adapting its compiler paths and dependencies.
+python3 compile_all.py compile --root C/n-body
 ```
 
-These are large benchmark datasets. Compiler versions, flags, input sizes, thread counts and machine configuration affect results. Some targets and sources are missing; see [known limitations](docs/KNOWN_LIMITATIONS.md).
+Supported actions: `compile` (default), `run`, `measure`, `mem`, `clean`.
+Existing language-specific `compile_all.py` entry points use the same runner and scan the current working directory, preserving their previous scope.
+
+A failed command or missing target produces a nonzero final status. Other available benchmarks continue, and a final summary counts successes, failures and missing targets. Output is streamed; redirect it when running benchmarks that generate large outputs. For `measure`, the runner waits five seconds between executed benchmark commands; adjust with `--delay SECONDS`.
+
+The inventory recognizes literal targets in the suite's standalone Makefiles. It does not resolve generated rules, included Makefiles or variable-expanded target names. Availability only means that a rule exists, not that its compiler, input files or implementation are usable. Dependencies, build directories, hidden directories and the RAPL tool are excluded from discovery. Build RAPL separately as shown above.
+
+## Generate input datasets
+
+From a fresh checkout, no preliminary compilation is needed:
+
+```sh
+bash gen-input.sh
+```
+
+This generates the default nucleotide/reverse-complement inputs with `n=25000000` and regex-redux input with `n=5000000` in the repository root. The source path and output directory are independent of the current working directory. Set `PYTHON` to select a Python 3 executable.
+
+For a small check:
+
+```sh
+bash gen-input.sh 10 5
+```
+
+Custom sizes are reflected in filenames (`knucleotide-input10.txt`, `revcomp-input10.txt`, `regexredux-input5.txt`); default benchmark recipes still expect the default sizes.
+
+All datasets are generated in a temporary directory before replacing outputs. A generator failure preserves existing files. Each final replacement is atomic on the same filesystem, but replacing all three files is not a single transaction against interruption or disk errors.
+
+Default datasets are large. Compiler versions, flags, input sizes, thread counts and machine configuration affect results. Some targets and sources are missing; see [known limitations](docs/KNOWN_LIMITATIONS.md).
 
 ## Contributing
 

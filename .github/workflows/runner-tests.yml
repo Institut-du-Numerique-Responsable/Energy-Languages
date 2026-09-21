@@ -1,4 +1,4 @@
-name: Runner regression tests
+name: Regression tests
 on: [push, pull_request]
 permissions:
   contents: read
@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Test runner with simulated RAPL readings
+      - name: Test runner, orchestration and input generation
         run: python3 -m unittest discover -s tests -v
       - name: Build Linux RAPL backend
         run: make -B -C RAPL

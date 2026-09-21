@@ -1,5 +1,14 @@
 # Changelog
 
+## INR orchestration fixes — 2026-09-21
+
+- Restore the documented root `compile_all.py` as a shared Python 3 runner; migrate the JavaScript, Fortran, FSharp and Java-GraalVM entry points and remove the `lazyme` dependency.
+- Report failures for `compile`, `run`, `measure`, `mem` and `clean`, continue the remaining available recipes, and return a nonzero aggregate status.
+- Use subprocess argument lists and working directories instead of interpolated shell commands; stream output instead of retaining entire benchmark output in memory.
+- Add target availability checks without recipe execution, explicit root selection and configurable measurement spacing.
+- Generate input data from the existing FASTA source using Python 3, independent of the current directory. Stage all datasets before publication and generate the shared nucleotide data once.
+- Add integration tests for orchestration and input generation. Missing benchmark implementations remain explicitly unsupported.
+
 ## INR initial edition — 2026-09-21
 
 Based on a local snapshot of Green Software Lab's Energy-Languages; exact upstream revision unknown.

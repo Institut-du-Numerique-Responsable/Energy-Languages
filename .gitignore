@@ -25,6 +25,7 @@ target/
 *.gpp_run
 RAPL/main
 # Generated benchmark inputs and output
+.inputs.*/
 *-input*.txt
 *.out
 core

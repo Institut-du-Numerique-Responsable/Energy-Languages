@@ -1,5 +1,11 @@
 # Energy Languages — INR edition
 
+[![Regression tests](https://github.com/Institut-du-Numerique-Responsable/Energy-Languages/actions/workflows/runner-tests.yml/badge.svg?branch=main)](https://github.com/Institut-du-Numerique-Responsable/Energy-Languages/actions/workflows/runner-tests.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-GitHub%20Pages-176b87)](https://institut-du-numerique-responsable.github.io/Energy-Languages/)
+[![Edition: INR](https://img.shields.io/badge/Edition-INR-173d63)](https://github.com/Institut-du-Numerique-Responsable)
+[![Data: historical](https://img.shields.io/badge/Data-historical-8a6200)](docs/BENCHMARK_RESULTS.md)
+
 **An improved derivative of [Green Software Lab's Energy-Languages](https://github.com/greensoftwarelab/Energy-Languages), maintained by the Institut du Numérique Responsable (INR).**
 
 This edition adds targeted reliability and safety fixes to the energy measurement runner, a shared Python 3 orchestrator, reliable input generation, regression tests and clearer documentation. The original research and benchmark implementations remain credited to their authors. This is an independent derivative, not an official upstream release.

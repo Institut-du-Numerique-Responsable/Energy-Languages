@@ -26,3 +26,11 @@ Pour demander l'indexation Google, valider la propriété du site dans Search Co
 Un fichier `robots.txt` doit se trouver à la racine du domaine : un fichier placé dans `/Energy-Languages/` ne contrôle pas les robots. Toute modification des règles de la racine doit être coordonnée avec les responsables du site de l'organisation. OAI-SearchBot concerne la recherche OpenAI et se distingue de GPTBot.
 
 Références : [Google et recherche IA](https://developers.google.com/search/docs/fundamentals/ai-optimization-guide), [jeux de données](https://developers.google.com/search/docs/appearance/structured-data/dataset), [robots.txt](https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec), [robots OpenAI](https://developers.openai.com/api/docs/bots), [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+
+## Signalement IndexNow
+
+`site/indexnow-key.txt` contient le jeton public de vérification du site, sans droit d'accès au dépôt. Le générateur publie le fichier de vérification correspondant à la racine du projet Pages. Les trois URL canoniques peuvent être signalées à `https://api.indexnow.org/indexnow` avec les champs `host`, `key`, `keyLocation` et `urlList`. La portée reste limitée à `/Energy-Languages/`. Un code 200 indique la réception ; 202 indique que la vérification de la clé est en attente. Aucun des deux ne prouve l'indexation. Ce signalement ne remplace pas Search Console. Voir la [documentation IndexNow](https://www.indexnow.org/documentation).
+
+## Maintenance GitHub
+
+Les modifications passent par une pull request vers `main`, avec le contrôle `runner` réussi sur une branche à jour et les conversations résolues. La protection s'applique aussi aux administrateurs ; force-push et suppression de `main` sont désactivés. Aucune approbation humaine supplémentaire n'est imposée pour permettre la maintenance avec un seul mainteneur ; une relecture reste recommandée. Les badges du README indiquent la CI, la licence, le site et le périmètre historique des données, sans prétendre à une certification scientifique.

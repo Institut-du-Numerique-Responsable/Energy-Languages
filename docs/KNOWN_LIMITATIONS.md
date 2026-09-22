@@ -13,9 +13,9 @@ The [historical results report](BENCHMARK_RESULTS.md) quantifies data-quality is
 ## Measurement and portability
 
 - RAPL support uses legacy Linux/Intel MSR access and CPU-model checks. Hardware validation is required; native macOS and Apple Silicon are unsupported.
-- The inherited backend subtracts counter readings without wraparound correction, opens MSR descriptors without closing them, and measures only the selected CPU package. Those issues remain outside the initial fixes.
-- Timing still uses wall-clock time, includes runner overhead and does not isolate the benchmark from other system activity.
-- A successful exit status does not prove a benchmark's output is correct. No complete expected-output comparison framework is included.
+- The backend now calculates unsigned 32-bit counter deltas and closes MSR descriptors after each operation. It measures only the package containing logical CPU 0, reported at initialization; it does not pin benchmark threads or aggregate multiple packages. More than one complete counter range of energy between reads cannot be detected from two endpoints: long runs require periodic sampling before they can be trusted.
+- Timing uses a monotonic clock, but includes runner overhead and does not isolate the benchmark from other system activity.
+- A successful exit status does not prove a benchmark's output is correct. `scripts/verify_output.py` provides an explicit reference-output preflight with tolerances and a JSON report. It is not automatically enforced by legacy measurement recipes; the complete suite still needs independently reviewed reference outputs.
 - Temporary-file staging prevents failed commands or sensor reads from appending a sample. It does not make the final CSV append transactional against disk failures or simultaneous writers. Use one writer per output file.
 - Existing CSV files mix delimiters and contain inherited measurements; they are not new INR results.
 - Existing Makefiles contain hard-coded runtime paths, legacy dependencies and machine-specific options. GNU `/usr/bin/time -v` and `modprobe` recipes are Linux-specific.
@@ -23,4 +23,4 @@ The [historical results report](BENCHMARK_RESULTS.md) quantifies data-quality is
 
 ## Scope of tests
 
-Automated tests compile the real RAPL command runner against a simulated backend, execute temporary Makefile recipes through the orchestrator, and compare small generated datasets with the FASTA source. The physical backend, all language toolchains and the full benchmark workloads have not been validated by these tests.
+Automated tests compile the real RAPL command runner against a simulated backend, execute temporary Makefile recipes through the orchestrator, and compare small generated datasets with the FASTA source. Counter arithmetic and descriptor closure are also exercised against fake MSR reads in the real backend. The physical sensors, all language toolchains and the full benchmark workloads have not been validated by these tests.

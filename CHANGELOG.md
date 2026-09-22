@@ -1,5 +1,12 @@
 # Changelog
 
+## Measurement reliability — 2026-09-22
+
+- Correct single-range RAPL counter rollover using unsigned 32-bit deltas; close MSR descriptors and prevent inheritance across exec.
+- Use monotonic timing and report the selected package scope. Correct CPU model-field matching and close CPU-info files on rejection.
+- Add an explicit output-validation command with numeric tolerances, timeout, nonzero-exit rejection and a JSON evidence report.
+- Exercise the actual backend using fake MSR readings, monotonic clock failures and incorrect benchmark outputs. Physical validation and complete reference coverage remain outstanding.
+
 ## Public website — 2026-09-21
 
 - Publish three lightweight French pages presenting findings, searchable historical results and methodology.

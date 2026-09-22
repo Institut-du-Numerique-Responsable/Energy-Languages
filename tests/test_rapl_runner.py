@@ -18,6 +18,14 @@ class RunnerTests(unittest.TestCase):
         stub = build / 'stub.c'
         stub.write_text('''#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+int clock_gettime(clockid_t clock, struct timespec *value) {
+    static long calls;
+    if (clock != CLOCK_MONOTONIC || getenv("FAIL_CLOCK")) return -1;
+    value->tv_sec = calls / 4;
+    value->tv_nsec = (calls++ % 4) * 250000000;
+    return 0;
+}
 int rapl_init(int core) { return getenv("FAIL_INIT") ? -1 : 0; }
 void rapl_before(FILE *fp, int core) {}
 void rapl_after(FILE *fp, int core) {
@@ -52,6 +60,16 @@ void rapl_after(FILE *fp, int core) {
         result = self.run_command('true', 'Audit', 'sample')
         self.assertEqual(result.returncode, 0)
         self.assertEqual(len(self.rows()), 10)
+
+    def test_monotonic_timing_and_clock_failure(self):
+        result = self.run_command('true', 'Audit', 'sample')
+        self.assertEqual(result.returncode, 0)
+        self.assertTrue(all(float(row.rsplit(',', 1)[1]) == 250 for row in self.rows()))
+        self.csv.unlink()
+        result = self.run_command('touch executed', 'Audit', 'sample', FAIL_CLOCK='1')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.cwd / 'executed').exists())
+        self.assertEqual(self.rows(), [])
 
     def test_failure_preserves_existing_results(self):
         self.csv.write_text('existing\n')

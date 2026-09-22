@@ -76,6 +76,16 @@ python3 -m unittest discover -s tests -v
 
 These tests validate runner behavior with simulated RAPL functions, orchestration and input generation. They do not validate physical energy readings or all benchmark algorithms. They also require `make` and Bash.
 
+## Verify benchmark output before measuring
+
+A zero exit code is insufficient. Use an independently reviewed expected output with the same input size and configuration:
+
+```sh
+python3 scripts/verify_output.py --expected reference.txt --report validation.json --atol 1e-9 -- python3 Python/n-body/nbody.python3 1000
+```
+
+The command must be trusted. The tool compares whitespace-separated tokens, checks numeric tolerances, rejects non-finite numbers and failed commands, and records output hashes and execution context. Choose tolerances for the algorithm and printed precision; the example tolerance is not universal. Legacy `measure` targets do not enforce this preflight. See [validation guidance](docs/VALIDATION.md).
+
 ## Measure energy on supported hardware
 
 The inherited backend requires **Linux and a compatible Intel CPU with accessible MSR devices**. It does not support native macOS/Apple Silicon measurement. Its CPU/domain detection is legacy; check the [limitations](docs/KNOWN_LIMITATIONS.md) before interpreting readings.

@@ -1,8 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
+#include <time.h>
 #include <sys/wait.h>
 #include "rapl.h"
 
@@ -43,12 +44,12 @@ int main(int argc, char **argv)
     }
 
     for (int i = 0; i < repetitions; i++) {
-        struct timeval before, after;
+        struct timespec before, after;
         /* Stage the row so a command or sensor failure cannot append it. */
         sample = tmpfile();
         if (!sample) { perror("tmpfile"); goto cleanup; }
-        if (gettimeofday(&before, NULL) != 0) {
-            perror("gettimeofday"); goto cleanup;
+        if (clock_gettime(CLOCK_MONOTONIC, &before) != 0) {
+            perror("clock_gettime"); goto cleanup;
         }
         rapl_before(sample, core);
         int status = system(argv[1]);
@@ -62,11 +63,11 @@ int main(int argc, char **argv)
             goto cleanup;
         }
         rapl_after(sample, core);
-        if (gettimeofday(&after, NULL) != 0) {
-            perror("gettimeofday"); goto cleanup;
+        if (clock_gettime(CLOCK_MONOTONIC, &after) != 0) {
+            perror("clock_gettime"); goto cleanup;
         }
         double milliseconds = (after.tv_sec - before.tv_sec) * 1000.0 +
-                              (after.tv_usec - before.tv_usec) / 1000.0;
+                              (after.tv_nsec - before.tv_nsec) / 1000000.0;
         if (fprintf(sample, " %G \n", milliseconds) < 0 ||
             fflush(sample) != 0 || fseek(sample, 0, SEEK_SET) != 0) {
             perror("sample output"); goto cleanup;

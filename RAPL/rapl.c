@@ -4,10 +4,10 @@
 int cpu_model;
 int core=0;
 
-double package_before,package_after;
-double pp0_before,pp0_after;
-double pp1_before=0.0,pp1_after;
-double dram_before=0.0,dram_after;
+uint32_t package_before,package_after;
+uint32_t pp0_before,pp0_after;
+uint32_t pp1_before=0,pp1_after;
+uint32_t dram_before=0,dram_after;
 
 double power_units,energy_units,time_units;
 
@@ -17,7 +17,7 @@ int open_msr(int core) {
   int fd;
 
   sprintf(msr_filename, "/dev/cpu/%d/msr", core);
-  fd = open(msr_filename, O_RDONLY);
+  fd = open(msr_filename, O_RDONLY | O_CLOEXEC);
   if ( fd < 0 ) {
     if ( errno == ENXIO ) {
       fprintf(stderr, "rdmsr: No CPU %d\n", core);
@@ -57,9 +57,9 @@ int detect_cpu(void) {
 
   FILE *fff;
 
-  int family,model=-1;
+  int family=-1,model=-1;
   char buffer[BUFSIZ],*result;
-  char vendor[BUFSIZ];
+  char vendor[BUFSIZ] = "";
 
   fff=fopen("/proc/cpuinfo","r");
   if (fff==NULL) return -1;
@@ -73,6 +73,7 @@ int detect_cpu(void) {
 
       if (strncmp(vendor,"GenuineIntel",12)) {
         printf("%s not an Intel chip\n",vendor);
+        fclose(fff);
         return -1;
       }
     }
@@ -81,11 +82,12 @@ int detect_cpu(void) {
       sscanf(result,"%*s%*s%*s%d",&family);
       if (family!=6) {
         printf("Wrong CPU family %d\n",family);
+        fclose(fff);
         return -1;
       }
     }
 
-    if (!strncmp(result,"model",5)) {
+    if (!strncmp(result,"model\t",6)) {
       sscanf(result,"%*s%*s%d",&model);
     }
 
@@ -151,6 +153,8 @@ int rapl_init(int core)
   */
 
 
+  close(fd);
+  fprintf(stderr, "RAPL scope: package containing logical CPU %d; other packages are not measured.\n", core);
   return 0;
 }
 
@@ -178,6 +182,7 @@ void show_power_info(int core)
 
   time_window=time_units*(double)((result>>48)&0x7fff);
   printf("Package maximum time window: %.6fs\n",time_window);
+  close(fd);
 }
 
 
@@ -205,7 +210,7 @@ void show_power_limit(int core)
           (result & (1LL<<48)) ? "clamped" : "not_clamped");
 
   printf("\n");
-
+  close(fd);
 }
 
 
@@ -219,7 +224,7 @@ void rapl_before(FILE * fp,int core)
   fd=open_msr(core);
   result=read_msr(fd,MSR_PKG_ENERGY_STATUS);
 
-  package_before=(double)result*energy_units;
+  package_before=(uint32_t)result;
   //  fprintf(fp,"Package energy: %.6fJ\n",package_before);
 
   /* only available on *Bridge-EP */
@@ -231,7 +236,7 @@ void rapl_before(FILE * fp,int core)
   }
 
   result=read_msr(fd,MSR_PP0_ENERGY_STATUS);
-  pp0_before=(double)result*energy_units;
+  pp0_before=(uint32_t)result;
   // fprintf(fp,"PowerPlane0 (core) for core %d energy before: %.6fJ\n",core,pp0_before);
 
   result=read_msr(fd,MSR_PP0_POLICY);
@@ -250,7 +255,7 @@ void rapl_before(FILE * fp,int core)
   if ((cpu_model==CPU_SANDYBRIDGE) || (cpu_model==CPU_IVYBRIDGE) ||
   (cpu_model==CPU_HASWELL)) {
      result=read_msr(fd,MSR_PP1_ENERGY_STATUS);
-     pp1_before=(double)result*energy_units;
+     pp1_before=(uint32_t)result;
      // fprintf(fp,"PowerPlane1 (on-core GPU if avail) before: %.6fJ\n",pp1_before);
      result=read_msr(fd,MSR_PP1_POLICY);
      int pp1_policy=(int)result&0x001f;
@@ -262,10 +267,11 @@ void rapl_before(FILE * fp,int core)
   if ((cpu_model==CPU_SANDYBRIDGE_EP) || (cpu_model==CPU_IVYBRIDGE_EP) ||
   (cpu_model==CPU_HASWELL)) {
      result=read_msr(fd,MSR_DRAM_ENERGY_STATUS);
-     dram_before=(double)result*energy_units;
+     dram_before=(uint32_t)result;
      // fprintf(fp,"DRAM energy before: %.6fJ\n",dram_before);
   }
 
+  close(fd);
 }
 
 
@@ -276,22 +282,22 @@ void rapl_after(FILE * fp , int core)
   fd=open_msr(core);
 
   result=read_msr(fd,MSR_PKG_ENERGY_STATUS);
-  package_after=(double)result*energy_units;
-  //  fprintf(fp,"Package energy: %.6fJ consumed\n",package_after-package_before);
-  fprintf(fp,"%.18f, ",package_after-package_before);  // PACKAGE
+  package_after=(uint32_t)result;
+  //  fprintf(fp,"Package energy: %.6fJ consumed\n",(double)(uint32_t)(package_after-package_before)*energy_units);
+  fprintf(fp,"%.18f, ",(double)(uint32_t)(package_after-package_before)*energy_units);  // PACKAGE
 
   result=read_msr(fd,MSR_PP0_ENERGY_STATUS);
-  pp0_after=(double)result*energy_units;
+  pp0_after=(uint32_t)result;
 
-  fprintf(fp,"%.18f, ",pp0_after-pp0_before);    // CORE
+  fprintf(fp,"%.18f, ",(double)(uint32_t)(pp0_after-pp0_before)*energy_units);    // CORE
 
 
   /* not available on SandyBridge-EP */
   if ((cpu_model==CPU_SANDYBRIDGE) || (cpu_model==CPU_IVYBRIDGE) ||
   (cpu_model==CPU_HASWELL)) {
      result=read_msr(fd,MSR_PP1_ENERGY_STATUS);
-     pp1_after=(double)result*energy_units;
-     fprintf(fp,"%.18f, ",pp1_after-pp1_before);     // GPU
+     pp1_after=(uint32_t)result;
+     fprintf(fp,"%.18f, ",(double)(uint32_t)(pp1_after-pp1_before)*energy_units);     // GPU
   }
   else
     fprintf(fp," , ");
@@ -299,10 +305,11 @@ void rapl_after(FILE * fp , int core)
   if ((cpu_model==CPU_SANDYBRIDGE_EP) || (cpu_model==CPU_IVYBRIDGE_EP) ||
   (cpu_model==CPU_HASWELL)) {
      result=read_msr(fd,MSR_DRAM_ENERGY_STATUS);
-     dram_after=(double)result*energy_units;
-     fprintf(fp,"%.18f, ",dram_after-dram_before);     // DRAM
+     dram_after=(uint32_t)result;
+     fprintf(fp,"%.18f, ",(double)(uint32_t)(dram_after-dram_before)*energy_units);     // DRAM
   }
   else
     fprintf(fp," , ");  
 
+  close(fd);
 }

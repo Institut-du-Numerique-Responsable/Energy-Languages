@@ -137,6 +137,8 @@ def build(output, base=BASE):
                                  results_current='aria-current="page"' if name == 'resultats.html' else '',
                                  method_current='aria-current="page"' if name == 'methode.html' else '')
         (output/name).write_text(page)
+    key = (ROOT/'site/indexnow-key.txt').read_text().strip()
+    (output/(key+'.txt')).write_text(key+'\n')
     (output/'.nojekyll').write_text('')
     (output/'sitemap.xml').write_text('<?xml version="1.0" encoding="UTF-8"?>\n'
                                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +

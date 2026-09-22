@@ -95,6 +95,11 @@ class SiteTests(unittest.TestCase):
             name = download['contentUrl'].rsplit('/', 1)[-1]
             self.assertTrue((self.output / 'data' / name).is_file())
 
+    def test_indexnow_verification_file_matches_key(self):
+        key = (ROOT / 'site/indexnow-key.txt').read_text().strip()
+        self.assertRegex(key, r'^[a-f0-9]{32}$')
+        self.assertEqual((self.output / (key + '.txt')).read_text().strip(), key)
+
     def test_sitemap_lists_all_canonical_pages(self):
         text = (self.output / 'sitemap.xml').read_text()
         for suffix in ['', 'resultats.html', 'methode.html']:

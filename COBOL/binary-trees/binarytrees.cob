@@ -1,0 +1,148 @@
+      >>SOURCE FORMAT FREE
+*> The Computer Language Benchmarks Game: binary-trees
+*> COBOL (GnuCOBOL) port by the Institut du Numerique Responsable.
+*> Every node is allocated individually with the C library calloc/free
+*> (no memory pool); GnuCOBOL ALLOCATE/FREE track allocations in a list,
+*> which makes each FREE slower as the number of live nodes grows.
+*> COBOL paragraphs are not recursive, so trees are built and walked
+*> depth-first with an explicit stack; each node is freed once counted.
+IDENTIFICATION DIVISION.
+PROGRAM-ID. binarytrees.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 ARG-TEXT          PIC X(20).
+01 N                 PIC S9(4) COMP-5.
+01 MIN-DEPTH         PIC S9(4) COMP-5 VALUE 4.
+01 MAX-DEPTH         PIC S9(4) COMP-5.
+01 STRETCH-DEPTH     PIC S9(4) COMP-5.
+01 DEPTH             PIC S9(4) COMP-5.
+01 TREE-DEPTH        PIC S9(4) COMP-5.
+01 ITERATIONS        PIC S9(18) COMP-5.
+01 K                 PIC S9(18) COMP-5.
+01 CHECK-SUM         PIC S9(18) COMP-5.
+01 NODE-COUNT        PIC S9(18) COMP-5.
+01 ROOT-PTR          USAGE POINTER.
+01 LONG-LIVED-PTR    USAGE POINTER.
+01 CUR-PTR           USAGE POINTER.
+01 CUR-DEPTH         PIC S9(4) COMP-5.
+01 SP                PIC S9(4) COMP-5.
+01 STACK.
+   05 STACK-ENTRY OCCURS 64 TIMES.
+      10 STACK-PTR   USAGE POINTER.
+      10 STACK-DEPTH PIC S9(4) COMP-5.
+01 NODE-ITEMS        PIC 9(9) COMP-5 VALUE 1.
+01 NODE-BYTES        PIC 9(9) COMP-5.
+01 OUT-A             PIC -(18)9.
+01 OUT-B             PIC -(18)9.
+01 OUT-C             PIC -(18)9.
+LINKAGE SECTION.
+01 TREE-NODE.
+   05 LEFT-PTR       USAGE POINTER.
+   05 RIGHT-PTR      USAGE POINTER.
+
+PROCEDURE DIVISION.
+MAIN-PARA.
+    ACCEPT ARG-TEXT FROM ARGUMENT-VALUE
+    MOVE 10 TO N
+    IF ARG-TEXT NOT = SPACES
+        COMPUTE N = FUNCTION NUMVAL(ARG-TEXT)
+    END-IF
+    IF N > 30
+        DISPLAY "depth must not exceed 30" UPON SYSERR
+        MOVE 1 TO RETURN-CODE
+        STOP RUN
+    END-IF
+    MOVE LENGTH OF TREE-NODE TO NODE-BYTES
+    COMPUTE MAX-DEPTH = FUNCTION MAX(MIN-DEPTH + 2, N)
+    COMPUTE STRETCH-DEPTH = MAX-DEPTH + 1
+
+    MOVE STRETCH-DEPTH TO TREE-DEPTH
+    PERFORM MAKE-TREE
+    PERFORM CHECK-AND-FREE
+    MOVE STRETCH-DEPTH TO OUT-A
+    MOVE NODE-COUNT TO OUT-B
+    DISPLAY "stretch tree of depth " FUNCTION TRIM(OUT-A)
+        X"09" " check: " FUNCTION TRIM(OUT-B)
+
+    MOVE MAX-DEPTH TO TREE-DEPTH
+    PERFORM MAKE-TREE
+    SET LONG-LIVED-PTR TO ROOT-PTR
+
+    PERFORM VARYING DEPTH FROM MIN-DEPTH BY 2 UNTIL DEPTH > MAX-DEPTH
+        COMPUTE ITERATIONS = 2 ** (MAX-DEPTH - DEPTH + MIN-DEPTH)
+        MOVE 0 TO CHECK-SUM
+        MOVE DEPTH TO TREE-DEPTH
+        PERFORM VARYING K FROM 1 BY 1 UNTIL K > ITERATIONS
+            PERFORM MAKE-TREE
+            PERFORM CHECK-AND-FREE
+            ADD NODE-COUNT TO CHECK-SUM
+        END-PERFORM
+        MOVE ITERATIONS TO OUT-A
+        MOVE DEPTH TO OUT-B
+        MOVE CHECK-SUM TO OUT-C
+        DISPLAY FUNCTION TRIM(OUT-A) X"09" " trees of depth "
+            FUNCTION TRIM(OUT-B) X"09" " check: " FUNCTION TRIM(OUT-C)
+    END-PERFORM
+
+    SET ROOT-PTR TO LONG-LIVED-PTR
+    PERFORM CHECK-AND-FREE
+    MOVE MAX-DEPTH TO OUT-A
+    MOVE NODE-COUNT TO OUT-B
+    DISPLAY "long lived tree of depth " FUNCTION TRIM(OUT-A)
+        X"09" " check: " FUNCTION TRIM(OUT-B)
+    STOP RUN.
+
+*> Build a complete tree of depth TREE-DEPTH; result in ROOT-PTR.
+MAKE-TREE.
+    PERFORM NEW-NODE
+    SET ROOT-PTR TO CUR-PTR
+    MOVE 1 TO SP
+    SET STACK-PTR(1) TO CUR-PTR
+    MOVE TREE-DEPTH TO STACK-DEPTH(1)
+    PERFORM UNTIL SP = 0
+        SET ADDRESS OF TREE-NODE TO STACK-PTR(SP)
+        MOVE STACK-DEPTH(SP) TO CUR-DEPTH
+        SUBTRACT 1 FROM SP
+        IF CUR-DEPTH > 0
+            SUBTRACT 1 FROM CUR-DEPTH
+            PERFORM NEW-NODE
+            SET LEFT-PTR TO CUR-PTR
+            ADD 1 TO SP
+            SET STACK-PTR(SP) TO CUR-PTR
+            MOVE CUR-DEPTH TO STACK-DEPTH(SP)
+            PERFORM NEW-NODE
+            SET RIGHT-PTR TO CUR-PTR
+            ADD 1 TO SP
+            SET STACK-PTR(SP) TO CUR-PTR
+            MOVE CUR-DEPTH TO STACK-DEPTH(SP)
+        END-IF
+    END-PERFORM.
+
+*> Allocate one node with null children; TREE-NODE keeps the parent.
+NEW-NODE.
+    CALL STATIC "calloc" USING BY VALUE NODE-ITEMS BY VALUE NODE-BYTES
+        RETURNING CUR-PTR
+    IF CUR-PTR = NULL
+        DISPLAY "out of memory" UPON SYSERR
+        MOVE 1 TO RETURN-CODE
+        STOP RUN
+    END-IF.
+
+*> Count the nodes of the tree at ROOT-PTR into NODE-COUNT, freeing them.
+CHECK-AND-FREE.
+    MOVE 0 TO NODE-COUNT
+    MOVE 1 TO SP
+    SET STACK-PTR(1) TO ROOT-PTR
+    PERFORM UNTIL SP = 0
+        SET CUR-PTR TO STACK-PTR(SP)
+        SUBTRACT 1 FROM SP
+        SET ADDRESS OF TREE-NODE TO CUR-PTR
+        ADD 1 TO NODE-COUNT
+        IF LEFT-PTR NOT = NULL
+            ADD 1 TO SP
+            SET STACK-PTR(SP) TO LEFT-PTR
+            ADD 1 TO SP
+            SET STACK-PTR(SP) TO RIGHT-PTR
+        END-IF
+        CALL STATIC "free" USING BY VALUE CUR-PTR RETURNING OMITTED
+    END-PERFORM.

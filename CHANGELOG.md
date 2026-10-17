@@ -1,5 +1,12 @@
 # Changelog
 
+## COBOL benchmarks — 2026-10-17
+
+- Add seven benchmarks written in COBOL for GnuCOBOL: n-body, spectral-norm, mandelbrot, fannkuch-redux, fasta, reverse-complement and binary-trees, with Makefiles following the suite's targets.
+- Validate each program byte for byte against independent references (Python programs of the suite, the published spectral-norm value, a sequential C mandelbrot) in `tests/test_cobol.py`; install GnuCOBOL in continuous integration.
+- Allocate binary-trees nodes with the C library `calloc`/`free`: GnuCOBOL `FREE` scans its allocation list, which made depth 16 take 230 s instead of 0.25 s.
+- Document the limits: GnuCOBOL is not COBOL on IBM Z, floating-point arithmetic is implemented in software, and no energy measurement accompanies these programs.
+
 ## Measurement reliability — 2026-09-22
 
 - Correct single-range RAPL counter rollover using unsigned 32-bit deltas; close MSR descriptors and prevent inheritance across exec.

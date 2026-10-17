@@ -23,11 +23,13 @@ target/
 *.dll
 *.gcc_run
 *.gpp_run
+*.cobol_run
 RAPL/main
 # Generated benchmark inputs and output
 .inputs.*/
 *-input*.txt
 *.out
+!tests/fixtures/cobol/*.out
 core
 core.*
 # Local secrets

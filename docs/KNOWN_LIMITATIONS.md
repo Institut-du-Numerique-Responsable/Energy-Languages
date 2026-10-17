@@ -21,6 +21,13 @@ The [historical results report](BENCHMARK_RESULTS.md) quantifies data-quality is
 - Existing Makefiles contain hard-coded runtime paths, legacy dependencies and machine-specific options. GNU `/usr/bin/time -v` and `modprobe` recipes are Linux-specific.
 - Build products and bundled compiled dependencies are excluded from the Git publication. Install/rebuild external libraries as needed, including GMP for recipes that reference a local library archive.
 
+## COBOL benchmarks
+
+- The seven COBOL programs are compiled with GnuCOBOL on x86 or ARM. They do not measure COBOL on IBM Z with Enterprise COBOL, whose compiler and hardware differ.
+- GnuCOBOL computes `COMP-2` expressions with decimal software arithmetic. n-body, spectral-norm and mandelbrot are estimated to take 2.7 h, 20 min and 8 h at the standard sizes; such runs require periodic counter sampling before RAPL readings can be trusted.
+- No inherited or INR measurement exists for COBOL. A comparison with other languages needs a new campaign on one machine, with the reference languages measured again.
+- k-nucleotide, pidigits and regex-redux are not implemented in COBOL.
+
 ## Scope of tests
 
-Automated tests compile the real RAPL command runner against a simulated backend, execute temporary Makefile recipes through the orchestrator, and compare small generated datasets with the FASTA source. Counter arithmetic and descriptor closure are also exercised against fake MSR reads in the real backend. The physical sensors, all language toolchains and the full benchmark workloads have not been validated by these tests.
+Automated tests compile the real RAPL command runner against a simulated backend, execute temporary Makefile recipes through the orchestrator, and compare small generated datasets with the FASTA source. Counter arithmetic and descriptor closure are also exercised against fake MSR reads in the real backend. When GnuCOBOL is installed, the seven COBOL programs are compiled and their small-size outputs compared byte for byte with independent references. The physical sensors, all language toolchains and the full benchmark workloads have not been validated by these tests.

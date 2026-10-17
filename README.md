@@ -52,6 +52,14 @@ The analysis separates alternate files, reports anomalous readings, and document
 
 Reproduce the numerical report with `python3 scripts/analyze_results.py`; add `--plots` when Matplotlib is installed to regenerate the figures.
 
+## COBOL benchmarks (mainframe language)
+
+The [`COBOL`](COBOL/README.md) directory adds seven benchmarks written in COBOL by INR and compiled with GnuCOBOL: n-body, spectral-norm, mandelbrot, fannkuch-redux, fasta, reverse-complement and binary-trees. Each one is validated against an independent implementation by `tests/test_cobol.py`. No energy measurements accompany them yet.
+
+GnuCOBOL runs on x86 or ARM: readings of these programs would not describe COBOL on an IBM Z mainframe. Its floating-point arithmetic is also implemented in software, which makes n-body, spectral-norm and mandelbrot much slower than in other languages. See the [COBOL limits](COBOL/README.md#limits).
+
+**En français :** sept benchmarks en COBOL, langage des grands systèmes, ont été ajoutés et validés. Ils ne sont pas encore mesurés et ne représentent pas la consommation d’un mainframe IBM Z.
+
 ## Origin and attribution
 
 Upstream project: [greensoftwarelab/Energy-Languages](https://github.com/greensoftwarelab/Energy-Languages).

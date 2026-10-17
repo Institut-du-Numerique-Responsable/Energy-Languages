@@ -15,7 +15,7 @@ WORKING-STORAGE SECTION.
 01 LINE-LEN          PIC S9(4) COMP-5.
 01 COL-IDX               PIC S9(4) COMP-5.
 01 K                 PIC S9(4) COMP-5.
-01 POS               PIC S9(4) COMP-5.
+01 ALU-POS               PIC S9(4) COMP-5.
 01 SEED              PIC S9(12) COMP-5 VALUE 42.
 01 PRODUCT           PIC S9(12) COMP-5.
 01 QUOTIENT          PIC S9(12) COMP-5.
@@ -93,7 +93,7 @@ MAIN-PARA.
     STOP RUN.
 
 REPEAT-ALU.
-    MOVE 1 TO POS
+    MOVE 1 TO ALU-POS
     MOVE TOTAL TO REMAINING
     PERFORM UNTIL REMAINING <= 0
         MOVE 60 TO LINE-LEN
@@ -101,10 +101,10 @@ REPEAT-ALU.
             MOVE REMAINING TO LINE-LEN
         END-IF
         PERFORM VARYING COL-IDX FROM 1 BY 1 UNTIL COL-IDX > LINE-LEN
-            MOVE ALU-CHAR(POS) TO LINE-BUF(COL-IDX:1)
-            ADD 1 TO POS
-            IF POS > ALU-LEN
-                MOVE 1 TO POS
+            MOVE ALU-CHAR(ALU-POS) TO LINE-BUF(COL-IDX:1)
+            ADD 1 TO ALU-POS
+            IF ALU-POS > ALU-LEN
+                MOVE 1 TO ALU-POS
             END-IF
         END-PERFORM
         DISPLAY LINE-BUF(1:LINE-LEN)

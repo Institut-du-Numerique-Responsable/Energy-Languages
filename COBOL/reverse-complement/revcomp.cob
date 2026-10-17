@@ -2,7 +2,8 @@
 *> The Computer Language Benchmarks Game: reverse-complement
 *> COBOL (GnuCOBOL) port by the Institut du Numerique Responsable.
 *> Reads FASTA from standard input; each sequence is buffered in memory
-*> that doubles as needed, then written back 60 characters per line.
+*> that doubles as needed (at most 256 MiB, the GnuCOBOL 3.1
+*> limit for a BASED item), then written back 60 characters per line.
 IDENTIFICATION DIVISION.
 PROGRAM-ID. revcomp.
 ENVIRONMENT DIVISION.
@@ -31,8 +32,8 @@ WORKING-STORAGE SECTION.
 01 SEQ-PTR           USAGE POINTER.
 01 OLD-PTR           USAGE POINTER.
 01 OUT-LINE          PIC X(60).
-01 SEQ-BUF           PIC X(999999999) BASED.
-01 OLD-BUF           PIC X(999999999) BASED.
+01 SEQ-BUF           PIC X(268435456) BASED.
+01 OLD-BUF           PIC X(268435456) BASED.
 
 PROCEDURE DIVISION.
 MAIN-PARA.
@@ -76,7 +77,7 @@ HANDLE-LINE.
 
 GROW-BUFFER.
     COMPUTE NEW-CAPACITY = CAPACITY * 2
-    IF NEW-CAPACITY > 999999999
+    IF NEW-CAPACITY > 268435456
         DISPLAY "sequence too long" UPON SYSERR
         MOVE 1 TO RETURN-CODE
         STOP RUN

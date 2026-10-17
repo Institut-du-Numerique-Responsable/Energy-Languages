@@ -32,8 +32,9 @@ class CobolBenchmarkTests(unittest.TestCase):
                 with self.subTest(benchmark=benchmark):
                     executable = Path(temp) / program
                     source = ROOT / 'COBOL' / benchmark / f'{program}.cob'
-                    subprocess.run(['cobc', '-x', '-O2', '-o', str(executable), str(source)],
-                                   check=True, capture_output=True, timeout=120)
+                    build = subprocess.run(['cobc', '-x', '-O2', '-o', str(executable), str(source)],
+                                           capture_output=True, text=True, timeout=120)
+                    self.assertEqual(build.returncode, 0, build.stderr)
                     input_bytes = (FIXTURES / stdin).read_bytes() if stdin else None
                     result = subprocess.run([str(executable), *args], input=input_bytes,
                                             capture_output=True, timeout=120)
